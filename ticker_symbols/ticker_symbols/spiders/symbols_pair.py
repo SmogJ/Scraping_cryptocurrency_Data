@@ -1,5 +1,11 @@
 import scrapy
 
+import gspread
+
+gc = gspread.service_account(file="symbolstickers.json")
+
+sh = gc.open("symbols_tickers").ticker
+
 
 class SymbolsPairSpider(scrapy.Spider):
     name = 'symbols_pair'
@@ -7,12 +13,12 @@ class SymbolsPairSpider(scrapy.Spider):
     start_urls = ['https://ng.investing.com/crypto/currency-pairs/']
 
     def parse(self, response):
-        crypto_table= response.css('table[id^="crypto_currencies_"]').get()
+        crypto_table= response.css('table[id^="crypto_currencies_"]').getall()
 
         for i in crypto_table:
-            showmore= response.css('span.arial_12.showArrowafter').get()
+            # showmore= response.css('span.arial_12.showArrowafter').get()
 
-            items= {
+            item= {
             'Name':response.css('td.left.bold.elp>a::text').get(),
 
             'Exchange': response.css('td:nth-child(3).left::text').get(),
@@ -32,6 +38,6 @@ class SymbolsPairSpider(scrapy.Spider):
             'Time': response.css('td[class$="-time"]::text').get()
             }
 
-            yield items
+            yield item
 
         pass
